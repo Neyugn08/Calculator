@@ -1,0 +1,73 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    display: flex; 
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;
+}
+
+.base {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    border-radius: 3px;
+    padding: 4px;
+    background-color: rgb(0, 0, 0);
+    width: 83px;
+    height: 108px;
+}
+
+.screen, .remove {
+    border: 0.5px solid black;
+    flex: 1;
+    width: 75px;
+}
+
+.screen {
+    background-color: gray;
+}
+
+.remove {
+    display: flex;
+    gap: 1px;
+    margin-top: 2px;
+}
+
+.clear, .delete {
+    flex: 1;
+    font-size: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.clear {
+    background-color: rgb(228, 96, 96);
+}
+
+.delete {
+    background-color: rgb(60, 113, 212);
+}
+
+.keys {
+    flex: 4;
+    width: 75px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.keys div {
+    background-color: rgb(198, 224, 230);
+    border: 0.5px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
