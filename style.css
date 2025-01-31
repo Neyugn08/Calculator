@@ -32,9 +32,12 @@ body {
 .screen {
     display: flex;
     align-items: center;
-    font-size: 8px;
     background-color: gray;
-    overflow-x: scroll;
+}
+
+.container {
+    line-height: 1;
+    font-size: 16px;
 }
 
 .remove {
@@ -60,7 +63,7 @@ body {
 }
 
 .keys {
-    font-size: 8px;
+    font-size: 16px;
     height: 64px;
     width: 75px;
     display: flex;
