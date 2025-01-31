@@ -25,12 +25,16 @@ body {
 
 .screen, .remove {
     border: 0.5px solid black;
-    flex: 1;
+    height: 16px;
     width: 75px;
 }
 
 .screen {
+    display: flex;
+    align-items: center;
+    font-size: 8px;
     background-color: gray;
+    overflow-x: scroll;
 }
 
 .remove {
@@ -56,7 +60,8 @@ body {
 }
 
 .keys {
-    flex: 4;
+    font-size: 8px;
+    height: 64px;
     width: 75px;
     display: flex;
     flex-wrap: wrap;
