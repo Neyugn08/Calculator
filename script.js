@@ -64,6 +64,7 @@ function mutiply(a, b) {
 
 function divide(a, b) {
     if (parseInt(a / b) == a / b) return parseInt(a / b);
+    if (b == 0) return "Error";
     return (a / b).toFixed(4);
 }
 
@@ -72,7 +73,10 @@ function expand16(div) {
     div.style.height = parseFloat(getComputedStyle(div).height.replace("px", "")) + 16 + "px";
 }
 
+let cntBug = 0;
+
 function calculating() {
+    //console.log(`operation before: ${operation}`);
     // Handling negative cases
     let dau = 1;
     if (negav()) dau = -1;
@@ -123,18 +127,35 @@ function calculating() {
             }
         }
         // Handling separate case
-        let ans = 0;
+        let ans = "iniVal";
         if (var2 == "+") ans = add(var1, var3);
         else if (var2 == "-") ans = subtract(var1, var3);
         else if (var2 == "×") ans = mutiply(var1, var3);
         else if (var2 == "/" ) ans = divide(var1, var3);
+        if (ans == "Error") {
+            error();
+            return;
+        }
+        console.log(`ans is: ${ans}`)
+        console.log(`var1 is: ${var1}`)
+        console.log(`var2 is: ${var2}`)
+        console.log(`var3 is: ${var3}`)
         // Handling errors 
-        ans *= dau;
-        if (ans != 0) operation = ans + operation;
+        if (ans != "iniVal" && isNumber(ans)) {
+            ans *= dau;
+            operation = ans + operation;
+        }
         else {
-            if (dau < 0) operation = dau.toString().slice(0,1) + operation;
+            if (dau < 0) operation = "-" + operation;
+        }
+        cntBug++;
+        //console.log(`operation after: ${operation}`);
+        if (cntBug == 50) {
+            error();
+            return;
         }
     }
+    cntBug = 0;
     container.textContent = operation;
 }
 
@@ -149,6 +170,10 @@ function isDot(char) {
 // Delete function
 function del() {
     let string = container.textContent;
+    if (container.textContent.length == 1) {
+        container.textContent = "0";
+        return;
+    }
     if (Number.isNaN(parseFloat(string[string.length - 1]))) {
         counterSym--;
         container.textContent = container.textContent.slice(0, container.textContent.length - 1);
@@ -163,11 +188,8 @@ function del() {
 // Clear function 
 function cle() {
     operation = "";
-    container.textContent = "";
+    container.textContent = "0";
     counterSym = 0;
-    container.style.height = scrOriH;
-    screen.style.height = scrOriH;
-    base.style.height = bsOriH;
 }
 
 // Handling negative cases function 
@@ -196,3 +218,8 @@ function negav() {
     }
     else return false;
 };
+
+function error() {
+    container.textContent = "Error";
+    setTimeout(cle, 1000);
+}
