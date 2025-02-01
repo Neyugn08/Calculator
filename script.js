@@ -1,12 +1,32 @@
 // Setting up the screen
 const screen = document.querySelector(".screen");
-let scrOriH = getComputedStyle(screen).height;
 const container = document.querySelector(".container");
 container.textContent = "0";
 const base = document.querySelector(".base");
-let bsOriH = getComputedStyle(base).height;
 let operation;
 let counterSym = 0;
+
+// 4 basic operation 
+let a = function add(a, b) {
+    if (parseInt(a + b) == a + b) return parseInt(a + b);
+    return (a + b).toFixed(4);
+};
+
+let s = function subtract(a, b) {
+    if (parseInt(a - b) == a - b) return parseInt(a - b);
+    return (a - b).toFixed(4);
+};
+
+let m = function mutiply(a, b) {
+    if (parseInt(a * b) == a * b) return parseInt(a * b);
+    return (a * b).toFixed(4);
+};
+
+let d = function divide(a, b) {
+    if (parseInt(a / b) == a / b) return parseInt(a / b);
+    if (b == 0) return "Error";
+    return (a / b).toFixed(4);
+};
 
 // Setting up the keys
 const keys = document.querySelector(".keys");
@@ -19,8 +39,7 @@ Array.from(operator).forEach(item => {
     item.addEventListener("click", (e) => {
         // Checking for invalid usage 
         if (Number.isNaN(parseFloat(e.target.textContent))) {
-            if (container.textContent === " ") return;
-            else counterSym++;
+            counterSym++;
             if (counterSym == 2) {
                 counterSym = 1;
                 return;
@@ -36,7 +55,20 @@ Array.from(operator).forEach(item => {
         operation = container.textContent;
 
         // Handling the operation 
-        if (e.target.textContent == "=") calculating();
+        if (e.target.textContent == "=") {
+            // Filtering the operation
+            counterSym = 0;
+            if (operation[0] === " " && operation.length != 0) {
+                // Filtering out the equal sign at the end
+                operation = operation.slice(1, operation.length - 1);
+            }
+            else {
+                operation = operation.slice(0, operation.length - 1);
+            }
+            preProcessingOperation();
+            processingOperation();
+            if (operation != "") container.textContent = operation;
+        }
     });
 });
 
@@ -46,63 +78,96 @@ const clr = document.querySelector(".clear")
 dlt.addEventListener("click", del);
 clr.addEventListener("click", cle);
 
-// 4 basic operation 
-function add(a, b) {
-    if (parseInt(a + b) == a + b) return parseInt(a + b);
-    return (a + b).toFixed(4);
+// Preprocessing mutiply and divide function
+function preProcessingOperation() {
+    while (operation.includes("/") || operation.includes("×")) {
+        let i1 = operation.indexOf("×");
+        let i2 = operation.indexOf("/");
+        let index;
+        let string = "";
+        let left; 
+        let right;
+        if (i1 > 0 && i2 > 0) {
+            index = Math.min(i1, i2);
+        } 
+        if (i1 * i2 < 0) {
+            index = Math.max(i1, i2);
+        }
+        else return;
+
+        for (i = index - 1; i >= 0; i--) {
+            if (!isNumber(parseFloat(operation[i])) && !isDot(operation[i])) {
+                string += operation.slice(i + 1, index + 1);
+                left = i + 1;
+                break;
+            }
+            else if (i == 0) {
+                string += operation.slice(0, index + 1);
+                console.log(string);
+                left = 0;
+            }
+        }
+        for (i = index + 1; i < operation.length; i++) {
+            if (!isNumber(parseFloat(operation[i])) && !isDot(operation[i])) {
+                string += operation.slice(index + 1, i);
+                right = i;
+                break;
+            }
+            else if (i == operation.length - 1) {
+                string += operation.slice(index + 1, i + 1);
+                right = i + 1;
+            }
+        }
+        console.log(`the string is: ${string}`);
+        console.log(`left: ${left}`);
+        console.log(`right: ${right}`);
+        let tmp = calculating(string, m, d);
+        if (tmp == "0") {
+            cle();
+            return;
+        }
+        if (right >= operation.length) {
+            operation = operation.slice(0, left) + tmp;
+            console.log(`Hello: ${operation}`);
+        }
+        else operation = operation.slice(0, left) + tmp + operation.slice(right, operation.length);
+        /*console.log(`operation in preprocessing is: ${operation}`);
+        break;*/
+    }
 }
 
-function subtract(a, b) {
-    if (parseInt(a - b) == a - b) return parseInt(a - b);
-    return (a - b).toFixed(4);
-}
-
-function mutiply(a, b) {
-    if (parseInt(a * b) == a * b) return parseInt(a * b);
-    return (a * b).toFixed(4);
-}
-
-function divide(a, b) {
-    if (parseInt(a / b) == a / b) return parseInt(a / b);
-    if (b == 0) return "Error";
-    return (a / b).toFixed(4);
-}
-
-// Expanding height by 16px function
-function expand16(div) {
-    div.style.height = parseFloat(getComputedStyle(div).height.replace("px", "")) + 16 + "px";
+function processingOperation() {
+    let tmp = calculating(operation, a, s);
+    if (tmp == "0") {
+        cle();
+        return;
+    }
+    operation = tmp;
 }
 
 let cntBug = 0;
 
-function calculating() {
-    //console.log(`operation before: ${operation}`);
-    // Handling negative cases
-    let dau = 1;
-    if (negav()) dau = -1;
-
-    // Filtering the operation
-    operation = operation.replace(/\n/g, "");
-    if (operation[0] === " " && operation.length != 0) {
-        // Filtering out the equal sign at the end
-        operation = operation.slice(1, operation.length - 1);
-        counterSym = 1;
-    }
-    else {
-        counterSym = 1;
-        operation = operation.slice(0, operation.length - 1);
-    }
-
+function calculating(operation, ope1, ope2) {
     // Checking for invalid usage
     if (`${parseFloat(operation).toFixed(4)}` == operation || `${parseFloat(operation)}` == operation) {
-        container.textContent = container.textContent.slice(0, container.textContent.length - 1);
-        counterSym--;
-        return;
+        //container.textContent = container.textContent.slice(0, container.textContent.length - 1);
+        if (counterSym > 0) counterSym--;
+        return operation;
     }
-
+    console.log(`operation before: ${operation}`);
+    // Handling negative cases
+    let dau = 1;
+    if (negav(operation)) {
+        dau = -1;
+        operation = negav(operation);
+    }
+    console.log(`operation after: ${operation}`);
     while (`${parseFloat(operation).toFixed(4)}` != operation && `${parseFloat(operation)}` != operation) {
         // Handling negative cases 
-        if (negav()) dau = -1;
+        if (negav(operation)) {
+            dau = -1;
+            operation = negav(operation);
+        }
         // Handling the operation
         let var1 = 0;
         let var2 = 0;
@@ -111,7 +176,7 @@ function calculating() {
             if (!isNumber(parseFloat(operation[i])) && !isDot(operation[i])) {
                 var1 = parseFloat(operation.slice(0, i));
                 var2 = operation[i];
-                counterSym--;
+                if (counterSym > 0) counterSym--;
                 for (j = i + 1; j < operation.length; j++) {
                     if (!isNumber(parseFloat(operation[j])) && !isDot(operation[j])) {
                         var3 = parseFloat(operation.slice(i + 1, j));
@@ -128,13 +193,13 @@ function calculating() {
         }
         // Handling separate case
         let ans = "iniVal";
-        if (var2 == "+") ans = add(var1, var3);
-        else if (var2 == "-") ans = subtract(var1, var3);
-        else if (var2 == "×") ans = mutiply(var1, var3);
-        else if (var2 == "/" ) ans = divide(var1, var3);
+        if (var2 == "+") ans = ope1(var1, var3);
+        else if (var2 == "-") ans = ope2(var1, var3);
+        else if (var2 == "×") ans = ope1(var1, var3);
+        else if (var2 == "/" ) ans = ope2(var1, var3);
         if (ans == "Error") {
             error();
-            return;
+            return "0";
         }
         console.log(`ans is: ${ans}`)
         console.log(`var1 is: ${var1}`)
@@ -150,13 +215,12 @@ function calculating() {
         }
         cntBug++;
         //console.log(`operation after: ${operation}`);
-        if (cntBug == 50) {
-            error();
-            return;
+        if (cntBug == 30) {
+            return "0";
         }
     }
     cntBug = 0;
-    container.textContent = operation;
+    return operation;
 }
 
 function isNumber(value) {
@@ -170,17 +234,21 @@ function isDot(char) {
 // Delete function
 function del() {
     let string = container.textContent;
-    if (container.textContent.length == 1) {
-        container.textContent = "0";
+    if (string.length == 1) {
+        cle();
+        return;
+    } 
+    if (string.length == 2 && !isNumber(parseFloat(operation[0]))) {
+        cle();
         return;
     }
     if (Number.isNaN(parseFloat(string[string.length - 1]))) {
-        counterSym--;
-        container.textContent = container.textContent.slice(0, container.textContent.length - 1);
+        if (counterSym > 0) counterSym--;
+        container.textContent = string.slice(0, string.length - 1);
         operation = container.textContent;
     }
     else {
-        container.textContent = container.textContent.slice(0, container.textContent.length - 1);
+        container.textContent = string.slice(0, string.length - 1);
         operation = container.textContent;
     }
 }
@@ -193,7 +261,7 @@ function cle() {
 }
 
 // Handling negative cases function 
-function negav() {
+function negav(operation) {
     if (operation[0] === "-") {
         operation = operation.slice(1);
         let i1 = 0;
@@ -214,12 +282,7 @@ function negav() {
         else if (i2 < i1 && i2 != 0) operation = operation.replace("-", "+");
         else if (i1 == 0 && i2 != 0) operation = operation.replace("-", "+");
         else if (i2 == 0 && i1 != 0) operation = operation.replace("+", "-");
-        return true;
+        return operation;
     }
     else return false;
 };
-
-function error() {
-    container.textContent = "Error";
-    setTimeout(cle, 1000);
-}
