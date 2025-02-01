@@ -48,7 +48,7 @@ Array.from(operator).forEach(item => {
 
         // Handling the operation 
         if (e.target.textContent == "=") {
-            calculating(operation);
+            calculating();
         }
     });
 });
@@ -86,14 +86,15 @@ function expand16(div) {
     div.style.height = parseFloat(getComputedStyle(div).height.replace("px", "")) + 16 + "px";
 }
 
-function calculating(operation) {
+let counterBug = 0;
+
+function calculating() {
     // Handling negative cases
     let dau = 1;
-    if (negav(operation)) {
+    if (negav()) {
         dau = -1;
-        operation = negav(operation);
     }
-    console.log(operation);
+    console.log(`operation in the first negav: ${operation}`);
 
     // Filtering the operation
     operation = operation.replace(/\n/g, "");
@@ -116,14 +117,20 @@ function calculating(operation) {
 
     while (`${parseFloat(operation).toFixed(4)}` != operation && `${parseFloat(operation)}` != operation) {
         // Handling negative cases 
-        if (negav(operation)) {
+        if (negav()) {
             dau = -1;
-            operation = negav(operation);
+        }
+        else {
+            console.log(operation);
         }
         // Handling the operation
         let var1, var2, var3;
         loop: for (i = 0; i < operation.length; i++) {
             if (!isNumber(parseFloat(operation[i])) && !isDot(operation[i])) {
+                console.log(`The index is ${i}`);
+                console.log(`operation at this stage is: ${operation}`);
+                console.log(`Operation[0] is: ${operation[0]}`);
+                console.log(`Dau is: ${dau}`);
                 var1 = parseFloat(operation.slice(0, i));
                 var2 = operation[i];
                 counterSym--;
@@ -147,8 +154,20 @@ function calculating(operation) {
         else if (var2 == "-") ans = subtract(var1, var3);
         else if (var2 == "×") ans = mutiply(var1, var3);
         else if (var2 == "/" ) ans = divide(var1, var3);
+        // Handling errors 
         ans *= dau;
+        console.log(`ans is: ${ans}`);
+        if (Number.isNaN(ans)) {
+            console.log(`ans: ${ans}`);
+            console.log(`var1: ${var1}`);
+            console.log(`var2: ${var2}`);
+            console.log(`var3: ${var3}`);
+        }
+        console.log(`operation in calculating is before adding ans: ${operation}`)
         operation = ans + operation;
+        console.log(`operation in calculating is after adding ans: ${operation}`)
+        counterBug++;
+        if (counterBug == 3) break;
     }
     container.textContent = operation;
 }
@@ -186,30 +205,40 @@ function cle() {
 }
 
 // Handling negative cases function 
-function negav(operation) {
-    if (operation[0] == "-") {
-        operation = operation.slice(1, operation.length);
-        console.log(operation);
-        let i1, i2;
+function negav() {
+    if (operation[0] === "-") {
+        operation = operation.slice(1);
+        let i1 = 0;
+        let i2 = 0;
         for (i = 0; i < operation.length; i++) {
-            if (operation[i] == "+") {
+            if (operation[i] === "+") {
                 i1 = i;
                 break;
             }
         }
         for (i = 0; i < operation.length; i++) {
-            if (operation[i] == "-") {
+            if (operation[i] === "-") {
                 i2 = i;
                 break;
             }
         }
-        if (i1 < i2) {
-            operation.replace("+", "-");
+        if (i1 < i2 && i1 != 0) {
+            operation = operation.replace("+", "-");
         }
-        else {
-            operation.replace("-", "+");
-        }  
-        return operation;
+        else if (i2 < i1 && i2 != 0) {
+            operation = operation.replace("-", "+");
+        }
+        else if (i1 == 0 && i2 != 0) {
+            operation = operation.replace("-", "+");
+        }
+        else if (i2 == 0 && i1 != 0) {
+            operation = operation.replace("+", "-");
+        }
+        console.log(`operation in negav() in true case is: ${operation}`);
+        return true;
     }
-    return -1;
+    else {
+        console.log(`operation in negav() in false case is: ${operation}`); 
+        return false;
+    }
 };
