@@ -216,6 +216,7 @@ function calculating(operation, ope1, ope2) {
         cntBug++;
         //console.log(`operation after: ${operation}`);
         if (cntBug == 30) {
+            cntBug = 0;
             return "0";
         }
     }
