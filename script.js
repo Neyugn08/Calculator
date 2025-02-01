@@ -80,6 +80,10 @@ clr.addEventListener("click", cle);
 
 // Preprocessing mutiply and divide function
 function preProcessingOperation() {
+    // Checking for invalid usage
+    if (isNumber(operation)) {
+        return;
+    }
     while (operation.includes("/") || operation.includes("×")) {
         let i1 = operation.indexOf("×");
         let i2 = operation.indexOf("/");
@@ -103,7 +107,6 @@ function preProcessingOperation() {
             }
             else if (i == 0) {
                 string += operation.slice(0, index + 1);
-                console.log(string);
                 left = 0;
             }
         }
@@ -118,9 +121,6 @@ function preProcessingOperation() {
                 right = i + 1;
             }
         }
-        console.log(`the string is: ${string}`);
-        console.log(`left: ${left}`);
-        console.log(`right: ${right}`);
         let tmp = calculating(string, m, d);
         if (tmp == "0") {
             cle();
@@ -128,15 +128,17 @@ function preProcessingOperation() {
         }
         if (right >= operation.length) {
             operation = operation.slice(0, left) + tmp;
-            console.log(`Hello: ${operation}`);
         }
         else operation = operation.slice(0, left) + tmp + operation.slice(right, operation.length);
-        /*console.log(`operation in preprocessing is: ${operation}`);
-        break;*/
     }
 }
 
 function processingOperation() {
+     // Checking for invalid usage
+     if (isNumber(operation)) {
+        if (counterSym > 0) counterSym = 0;
+        return;
+    }
     let tmp = calculating(operation, a, s);
     if (tmp == "0") {
         cle();
@@ -149,20 +151,18 @@ let cntBug = 0;
 
 function calculating(operation, ope1, ope2) {
     // Checking for invalid usage
-    if (`${parseFloat(operation).toFixed(4)}` == operation || `${parseFloat(operation)}` == operation) {
+    if (isNumber(operation)) {
         //container.textContent = container.textContent.slice(0, container.textContent.length - 1);
         if (counterSym > 0) counterSym--;
         return operation;
     }
-    console.log(`operation before: ${operation}`);
     // Handling negative cases
     let dau = 1;
     if (negav(operation)) {
         dau = -1;
         operation = negav(operation);
     }
-    console.log(`operation after: ${operation}`);
-    while (`${parseFloat(operation).toFixed(4)}` != operation && `${parseFloat(operation)}` != operation) {
+    while (!isNumber(operation)) {
         // Handling negative cases 
         if (negav(operation)) {
             dau = -1;
@@ -198,13 +198,8 @@ function calculating(operation, ope1, ope2) {
         else if (var2 == "×") ans = ope1(var1, var3);
         else if (var2 == "/" ) ans = ope2(var1, var3);
         if (ans == "Error") {
-            error();
             return "0";
         }
-        console.log(`ans is: ${ans}`)
-        console.log(`var1 is: ${var1}`)
-        console.log(`var2 is: ${var2}`)
-        console.log(`var3 is: ${var3}`)
         // Handling errors 
         if (ans != "iniVal" && isNumber(ans)) {
             ans *= dau;
@@ -214,7 +209,6 @@ function calculating(operation, ope1, ope2) {
             if (dau < 0) operation = "-" + operation;
         }
         cntBug++;
-        //console.log(`operation after: ${operation}`);
         if (cntBug == 30) {
             cntBug = 0;
             return "0";
