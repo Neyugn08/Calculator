@@ -20,12 +20,12 @@ body {
     padding: 4px;
     background-color: rgb(0, 0, 0);
     width: 83px;
-    height: 108px;
+    /*height: 108px;*/
 }
 
 .screen, .remove {
     border: 0.5px solid black;
-    height: 16px;
+    /*height: 16px;*/
     width: 75px;
 }
 
@@ -33,14 +33,21 @@ body {
     display: flex;
     align-items: center;
     background-color: gray;
+    min-height: 16.8px;
 }
 
 .container {
+    display: flex;
     line-height: 1;
     font-size: 16px;
+
+    word-break: break-word;
+    overflow-wrap: break-word; 
+    white-space: normal; 
 }
 
 .remove {
+    height: 16px;
     display: flex;
     gap: 1px;
     margin-top: 2px;

@@ -20,9 +20,7 @@ Array.from(operator).forEach(item => {
         // Checking for invalid usage 
         if (Number.isNaN(parseFloat(e.target.textContent))) {
             if (container.textContent === " ") return;
-            else {
-                counterSym++;
-            }
+            else counterSym++;
             if (counterSym == 2) {
                 counterSym = 1;
                 return;
@@ -30,26 +28,15 @@ Array.from(operator).forEach(item => {
         }
         else {
             counterSym = 0;
+            if (container.textContent == "0") container.textContent = "";
         }
 
         // Populating the screen
         container.textContent = container.textContent + e.target.textContent;
         operation = container.textContent;
 
-        // Handling the overflow 
-        if (parseFloat(getComputedStyle(container).width.replace("px", "")) >= 75) {
-            container.textContent = container.textContent.slice(0, container.textContent.length - 1) + "\n";
-            // Expanding the screen and the base
-            expand16(base);
-            expand16(screen);
-            expand16(container);
-            container.textContent = container.textContent + e.target.textContent;
-        }
-
         // Handling the operation 
-        if (e.target.textContent == "=") {
-            calculating();
-        }
+        if (e.target.textContent == "=") calculating();
     });
 });
 
@@ -58,7 +45,6 @@ const dlt = document.querySelector(".delete");
 const clr = document.querySelector(".clear")
 dlt.addEventListener("click", del);
 clr.addEventListener("click", cle);
-
 
 // 4 basic operation 
 function add(a, b) {
@@ -86,15 +72,10 @@ function expand16(div) {
     div.style.height = parseFloat(getComputedStyle(div).height.replace("px", "")) + 16 + "px";
 }
 
-let counterBug = 0;
-
 function calculating() {
     // Handling negative cases
     let dau = 1;
-    if (negav()) {
-        dau = -1;
-    }
-    console.log(`operation in the first negav: ${operation}`);
+    if (negav()) dau = -1;
 
     // Filtering the operation
     operation = operation.replace(/\n/g, "");
@@ -117,20 +98,13 @@ function calculating() {
 
     while (`${parseFloat(operation).toFixed(4)}` != operation && `${parseFloat(operation)}` != operation) {
         // Handling negative cases 
-        if (negav()) {
-            dau = -1;
-        }
-        else {
-            console.log(operation);
-        }
+        if (negav()) dau = -1;
         // Handling the operation
-        let var1, var2, var3;
+        let var1 = 0;
+        let var2 = 0;
+        let var3 = 0;
         loop: for (i = 0; i < operation.length; i++) {
             if (!isNumber(parseFloat(operation[i])) && !isDot(operation[i])) {
-                console.log(`The index is ${i}`);
-                console.log(`operation at this stage is: ${operation}`);
-                console.log(`Operation[0] is: ${operation[0]}`);
-                console.log(`Dau is: ${dau}`);
                 var1 = parseFloat(operation.slice(0, i));
                 var2 = operation[i];
                 counterSym--;
@@ -149,25 +123,17 @@ function calculating() {
             }
         }
         // Handling separate case
-        let ans;
+        let ans = 0;
         if (var2 == "+") ans = add(var1, var3);
         else if (var2 == "-") ans = subtract(var1, var3);
         else if (var2 == "×") ans = mutiply(var1, var3);
         else if (var2 == "/" ) ans = divide(var1, var3);
         // Handling errors 
         ans *= dau;
-        console.log(`ans is: ${ans}`);
-        if (Number.isNaN(ans)) {
-            console.log(`ans: ${ans}`);
-            console.log(`var1: ${var1}`);
-            console.log(`var2: ${var2}`);
-            console.log(`var3: ${var3}`);
+        if (ans != 0) operation = ans + operation;
+        else {
+            if (dau < 0) operation = dau.toString().slice(0,1) + operation;
         }
-        console.log(`operation in calculating is before adding ans: ${operation}`)
-        operation = ans + operation;
-        console.log(`operation in calculating is after adding ans: ${operation}`)
-        counterBug++;
-        if (counterBug == 3) break;
     }
     container.textContent = operation;
 }
@@ -222,23 +188,11 @@ function negav() {
                 break;
             }
         }
-        if (i1 < i2 && i1 != 0) {
-            operation = operation.replace("+", "-");
-        }
-        else if (i2 < i1 && i2 != 0) {
-            operation = operation.replace("-", "+");
-        }
-        else if (i1 == 0 && i2 != 0) {
-            operation = operation.replace("-", "+");
-        }
-        else if (i2 == 0 && i1 != 0) {
-            operation = operation.replace("+", "-");
-        }
-        console.log(`operation in negav() in true case is: ${operation}`);
+        if (i1 < i2 && i1 != 0) operation = operation.replace("+", "-");
+        else if (i2 < i1 && i2 != 0) operation = operation.replace("-", "+");
+        else if (i1 == 0 && i2 != 0) operation = operation.replace("-", "+");
+        else if (i2 == 0 && i1 != 0) operation = operation.replace("+", "-");
         return true;
     }
-    else {
-        console.log(`operation in negav() in false case is: ${operation}`); 
-        return false;
-    }
+    else return false;
 };
