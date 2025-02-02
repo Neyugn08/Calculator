@@ -94,7 +94,7 @@ function preProcessingOperation() {
         if (i1 > 0 && i2 > 0) {
             index = Math.min(i1, i2);
         } 
-        if (i1 * i2 < 0) {
+        else if (i1 * i2 < 0) {
             index = Math.max(i1, i2);
         }
         else return;
