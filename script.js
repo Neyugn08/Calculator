@@ -4,28 +4,24 @@ const container = document.querySelector(".container");
 container.textContent = "0";
 const base = document.querySelector(".base");
 let operation;
-let counterSym = 0;
+let regInp = /^-?(\d+(\.\d+)?[+\-×\/])*(\d+(\.\d+)?)[+\-×\/=]?$/;
 
 // 4 basic operation 
 let a = function add(a, b) {
-    if (parseInt(a + b) == a + b) return parseInt(a + b);
-    return (a + b).toFixed(4);
+    return parseInt((a + b) * 1000) / 1000;
 };
 
 let s = function subtract(a, b) {
-    if (parseInt(a - b) == a - b) return parseInt(a - b);
-    return (a - b).toFixed(4);
+    return parseInt((a - b) * 1000) / 1000;
 };
 
 let m = function mutiply(a, b) {
-    if (parseInt(a * b) == a * b) return parseInt(a * b);
-    return (a * b).toFixed(4);
+    return parseInt(a * b * 1000) / 1000;
 };
 
 let d = function divide(a, b) {
-    if (parseInt(a / b) == a / b) return parseInt(a / b);
     if (b == 0) return "Error";
-    return (a / b).toFixed(4);
+    return parseInt(a / b * 1000) / 1000;
 };
 
 // Setting up the keys
@@ -38,15 +34,10 @@ Array.from(operator).forEach(item => {
     // Making the keys function
     item.addEventListener("click", (e) => {
         // Checking for invalid usage 
-        if (Number.isNaN(parseFloat(e.target.textContent))) {
-            counterSym++;
-            if (counterSym == 2) {
-                counterSym = 1;
-                return;
-            }
+        if (regInp.test(container.textContent + e.target.textContent) == false) {
+           return;
         }
         else {
-            counterSym = 0;
             if (container.textContent == "0") container.textContent = "";
         }
 
@@ -57,7 +48,6 @@ Array.from(operator).forEach(item => {
         // Handling the operation 
         if (e.target.textContent == "=") {
             // Filtering the operation
-            counterSym = 0;
             if (operation[0] === " " && operation.length != 0) {
                 // Filtering out the equal sign at the end
                 operation = operation.slice(1, operation.length - 1);
@@ -98,7 +88,6 @@ function preProcessingOperation() {
             index = Math.max(i1, i2);
         }
         else return;
-
         for (i = index - 1; i >= 0; i--) {
             if (!isNumber(parseFloat(operation[i])) && !isDot(operation[i])) {
                 string += operation.slice(i + 1, index + 1);
@@ -136,7 +125,6 @@ function preProcessingOperation() {
 function processingOperation() {
      // Checking for invalid usage
      if (isNumber(operation)) {
-        if (counterSym > 0) counterSym = 0;
         return;
     }
     let tmp = calculating(operation, a, s);
@@ -147,13 +135,9 @@ function processingOperation() {
     operation = tmp;
 }
 
-let cntBug = 0;
-
 function calculating(operation, ope1, ope2) {
     // Checking for invalid usage
     if (isNumber(operation)) {
-        //container.textContent = container.textContent.slice(0, container.textContent.length - 1);
-        if (counterSym > 0) counterSym--;
         return operation;
     }
     // Handling negative cases
@@ -176,7 +160,6 @@ function calculating(operation, ope1, ope2) {
             if (!isNumber(parseFloat(operation[i])) && !isDot(operation[i])) {
                 var1 = parseFloat(operation.slice(0, i));
                 var2 = operation[i];
-                if (counterSym > 0) counterSym--;
                 for (j = i + 1; j < operation.length; j++) {
                     if (!isNumber(parseFloat(operation[j])) && !isDot(operation[j])) {
                         var3 = parseFloat(operation.slice(i + 1, j));
@@ -208,13 +191,7 @@ function calculating(operation, ope1, ope2) {
         else {
             if (dau < 0) operation = "-" + operation;
         }
-        cntBug++;
-        if (cntBug == 30) {
-            cntBug = 0;
-            return "0";
-        }
     }
-    cntBug = 0;
     return operation;
 }
 
@@ -238,7 +215,6 @@ function del() {
         return;
     }
     if (Number.isNaN(parseFloat(string[string.length - 1]))) {
-        if (counterSym > 0) counterSym--;
         container.textContent = string.slice(0, string.length - 1);
         operation = container.textContent;
     }
@@ -252,7 +228,6 @@ function del() {
 function cle() {
     operation = "";
     container.textContent = "0";
-    counterSym = 0;
 }
 
 // Handling negative cases function 
