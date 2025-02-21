@@ -112,6 +112,7 @@ function preProcessingOperation() {
         }
         let tmp = calculating(string, m, d);
         if (tmp == "0") {
+            console.log("here1")
             cle();
             return;
         }
@@ -120,15 +121,17 @@ function preProcessingOperation() {
         }
         else operation = operation.slice(0, left) + tmp + operation.slice(right, operation.length);
     }
+    console.log(1);
 }
 
 function processingOperation() {
      // Checking for invalid usage
-     if (isNumber(operation)) {
+     if (isNumber(operation) || operation == "") {
         return;
     }
     let tmp = calculating(operation, a, s);
     if (tmp == "0") {
+        console.log("here2")
         cle();
         return;
     }
@@ -146,7 +149,7 @@ function calculating(operation, ope1, ope2) {
         dau = -1;
         operation = negav(operation);
     }
-    while (!isNumber(operation)) {
+    while (!isNumber(operation) && operation !== NaN && operation !== undefined && operation != Infinity) {
         // Handling negative cases 
         if (negav(operation)) {
             dau = -1;
@@ -181,6 +184,7 @@ function calculating(operation, ope1, ope2) {
         else if (var2 == "×") ans = ope1(var1, var3);
         else if (var2 == "/" ) ans = ope2(var1, var3);
         if (ans == "Error") {
+            console.log({operation, ans, var1, var2, var3});
             return "0";
         }
         // Handling errors 
@@ -191,6 +195,7 @@ function calculating(operation, ope1, ope2) {
         else {
             if (dau < 0) operation = "-" + operation;
         }
+        console.log(operation);
     }
     return operation;
 }
